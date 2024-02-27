@@ -35,51 +35,15 @@ public class App {
                     while ((line = reader.readLine()) != null) {
                         try {
                             BigDecimal number = BigDecimal.valueOf(Double.parseDouble(line.trim()));
-                            if (min == null) min = number;
-                            if (max == null) max = number;
-                            // MIN
-                            if (number.compareTo(min) <= 0) {
-                                min = number;
-                            }
-                            // MAX
-                            if (number.compareTo(max) > 0) {
-                                max = number;
-                            }
-                            // SUM
+                            if (min == null || number.compareTo(min) < 0) min = number;
+                            if (max == null || number.compareTo(max) > 0) max = number;
                             sum = sum.add(number);
+                            // Incr
+                            longestIncrSeq = findSeq(number, longestIncrSeq, currentIncrSeq, true);
+                            // Decr
+                            longestDecrSeq = findSeq(number, longestDecrSeq, currentDecrSeq, false);
 
                             numbers.add(number);
-
-                            // Incr
-                            if (currentIncrSeq.isEmpty() || number.compareTo(currentIncrSeq.getLast()) > 0) {
-                                currentIncrSeq.add(number);
-                            } else {
-                                if (currentIncrSeq.size() > longestIncrSeq.size()) {
-                                    longestIncrSeq = new LinkedList<>(currentIncrSeq);
-                                }
-                                currentIncrSeq.clear();
-                                currentIncrSeq.add(number);
-                            }
-
-                            if (currentIncrSeq.size() > longestIncrSeq.size()) {
-                                longestIncrSeq = new LinkedList<>(currentIncrSeq);
-                            }
-
-                            // Decr
-                            if (currentDecrSeq.isEmpty() || number.compareTo(currentDecrSeq.getLast()) < 0) {
-                                currentDecrSeq.add(number);
-                            } else {
-                                if (currentDecrSeq.size() > longestDecrSeq.size()) {
-                                    longestDecrSeq = new LinkedList<>(currentDecrSeq);
-                                }
-                                currentDecrSeq.clear();
-                                currentDecrSeq.add(number);
-                            }
-
-                            if (currentDecrSeq.size() > longestDecrSeq.size()) {
-                                longestDecrSeq = new LinkedList<>(currentDecrSeq);
-                            }
-
                         } catch (NumberFormatException e) {
                             System.err.println("NumberFormatException! :" + e.getMessage());
                         }
@@ -87,6 +51,7 @@ public class App {
                 } catch (IOException e) {
                     System.err.println("Something went wrong!");
                 }
+
                 int size = numbers.size();
                 // MAX
                 System.out.println("max: " + max);
@@ -96,9 +61,9 @@ public class App {
                 printMedian(numbers);
                 // AVERAGE
                 System.out.println("average: " + sum.divide(BigDecimal.valueOf(size), 2, RoundingMode.UP));
-                // the largest increasing sequence
+                // INCR
                 printList("the largest increasing sequence", longestIncrSeq);
-                // the largest decreasing sequence
+                // DECR
                 printList("the largest decreasing sequence", longestDecrSeq);
 
                 long end = System.currentTimeMillis();
@@ -112,17 +77,34 @@ public class App {
         }
     }
 
+    private static LinkedList<BigDecimal> findSeq(
+            BigDecimal number,
+            LinkedList<BigDecimal> longestSeq,
+            LinkedList<BigDecimal> currentSeq,
+            boolean increasing) {
+        if (currentSeq.isEmpty() ||
+                (increasing && number.compareTo(currentSeq.getLast()) > 0) ||
+                (!increasing && number.compareTo(currentSeq.getLast()) < 0)) {
+            currentSeq.add(number);
+        } else {
+            if (currentSeq.size() > longestSeq.size()) {
+                longestSeq = new LinkedList<>(currentSeq);
+            }
+            currentSeq.clear();
+            currentSeq.add(number);
+        }
+        return longestSeq;
+    }
+
     private static void printMedian(List<BigDecimal> numbers) {
         List<BigDecimal> sortedList = new ArrayList<>(numbers);
-        Comparator<BigDecimal> comparator = Comparator.naturalOrder();
-        sortedList.sort(comparator);
+        sortedList.sort(Comparator.naturalOrder());
         int sortedSize = sortedList.size();
         int half = sortedSize / 2;
         if (sortedSize % 2 == 0) {
             BigDecimal result = (sortedList.get(half).add(sortedList.get(half - 1)))
                     .divide(BigDecimal.valueOf(2), 2, RoundingMode.UP);
             System.out.println("median: " + result);
-
         } else {
             System.out.println("median: " + sortedList.get(half));
         }
@@ -139,4 +121,3 @@ public class App {
         }
     }
 }
-
