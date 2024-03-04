@@ -17,3 +17,4 @@ To run on Windows:
     
 - ```<filname>``` -  Name of the file containing statistical data
 - Make sure the file is in the same folder as App.jar
+- ```Java``` must be installed on your PC (check version: ```java -version```)
