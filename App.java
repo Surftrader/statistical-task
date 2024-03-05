@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class App {
 
@@ -128,12 +129,12 @@ public class App {
 
     private static void printList(String name, List<BigDecimal> list) {
         System.out.println(name + "(" + list.size() + "):");
-        for (int i = 0; i < list.size(); i++) {
+        IntStream.range(0, list.size()).forEach(i -> {
             if (i == list.size() - 1) {
                 System.out.println(list.get(i));
             } else {
                 System.out.print(list.get(i) + ", ");
             }
-        }
+        });
     }
 }
